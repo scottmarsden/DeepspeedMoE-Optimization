@@ -1,0 +1,119 @@
+
+-------------------------- DeepSpeed Flops Profiler --------------------------
+Profile Summary at step 2:
+Notations:
+data parallel size (dp_size), model parallel size(mp_size),
+number of parameters (params), number of multiply-accumulate operations(MACs),
+number of floating-point operations (flops), floating-point operations per second (FLOPS),
+fwd latency (forward propagation latency), bwd latency (backward propagation latency),
+step (weights update latency), iter latency (sum of fwd, bwd and step latency)
+
+world size:                                                   4       
+data parallel size:                                           4       
+model parallel size:                                          1       
+batch size per GPU:                                           4       
+params per gpu:                                               113.33 k
+params of model = params per GPU * mp_size:                   113.33 k
+fwd MACs per GPU:                                             2.81 MMACs
+fwd flops per GPU:                                            5.71 M  
+fwd flops of model = fwd flops per GPU * mp_size:             5.71 M  
+fwd latency:                                                  42.88 ms
+fwd FLOPS per GPU = fwd flops per GPU / fwd latency:          133.21 MFLOPS
+bwd latency:                                                  18.24 ms
+bwd FLOPS per GPU = 2 * fwd flops per GPU / bwd latency:      626.19 MFLOPS
+fwd+bwd FLOPS per GPU = 3 * fwd flops per GPU / (fwd+bwd latency):   280.36 MFLOPS
+step latency:                                                 22.71 ms
+iter latency:                                                 83.84 ms
+FLOPS per GPU = 3 * fwd flops per GPU / iter latency:         204.4 MFLOPS
+samples/second:                                               190.84  
+
+----------------------------- Aggregated Profile per GPU -----------------------------
+Top 1 modules in terms of params, MACs or fwd latency at different model depths:
+depth 0:
+    params      - {'Net': '113.33 k'}
+    MACs        - {'Net': '2.81 MMACs'}
+    fwd latency - {'Net': '42.74 ms'}
+depth 1:
+    params      - {'Linear': '59.13 k'}
+    MACs        - {'Conv2d': '2.37 MMACs'}
+    fwd latency - {'ModuleList': '40.62 ms'}
+depth 2:
+    params      - {'MoE': '58.47 k'}
+    MACs        - {'MoE': '202.94 KMACs'}
+    fwd latency - {'MoE': '40.62 ms'}
+depth 3:
+    params      - {'MOELayer': '43.85 k'}
+    MACs        - {'Linear': '114.24 KMACs'}
+    fwd latency - {'MOELayer': '39.56 ms'}
+depth 4:
+    params      - {'Experts': '42.84 k'}
+    MACs        - {'Experts': '84.67 KMACs'}
+    fwd latency - {'TopKGate': '35.43 ms'}
+depth 5:
+    params      - {'ModuleList': '42.84 k'}
+    MACs        - {'ModuleList': '84.67 KMACs'}
+    fwd latency - {'ModuleList': '833.75 us'}
+
+------------------------------ Detailed Profile per GPU ------------------------------
+Each module profile is listed after its name in the following order: 
+params, percentage of total params, MACs, percentage of total MACs, fwd latency, percentage of total fwd latency, fwd FLOPS
+
+Note: 1. A module can have torch.nn.module or torch.nn.functional to compute logits (e.g. CrossEntropyLoss). They are not counted as submodules, thus not to be printed out. However they make up the difference between a parent's MACs (or latency) and the sum of its submodules'.
+2. Number of floating-point operations is a theoretical estimation, thus FLOPS computed using that could be larger than the maximum system throughput.
+3. The fwd latency listed in the top module's profile is directly captured at the module forward function in PyTorch, thus it's less than the fwd latency shown above which is captured in DeepSpeed.
+
+Net(
+  113.33 k, 100.00% Params, 2.81 MMACs, 100.00% MACs, 42.74 ms, 100.00% latency, 133.67 MFLOPS, 
+  (conv1): Conv2d(456, 0.40% Params, 1.41 MMACs, 50.22% MACs, 342.37 us, 0.80% latency, 8.3 GFLOPS, 3, 6, kernel_size=(5, 5), stride=(1, 1))
+  (pool): MaxPool2d(0, 0.00% Params, 0 MACs, 0.00% MACs, 260.35 us, 0.61% latency, 96.85 MFLOPS, kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (conv2): Conv2d(2.42 k, 2.13% Params, 960.0 KMACs, 34.17% MACs, 368.12 us, 0.86% latency, 5.23 GFLOPS, 6, 16, kernel_size=(5, 5), stride=(1, 1))
+  (fc1): Linear(48.12 k, 42.46% Params, 192.0 KMACs, 6.83% MACs, 158.07 us, 0.37% latency, 2.43 GFLOPS, in_features=400, out_features=120, bias=True)
+  (fc2): Linear(10.16 k, 8.97% Params, 40.32 KMACs, 1.43% MACs, 110.15 us, 0.26% latency, 732.1 MFLOPS, in_features=120, out_features=84, bias=True)
+  (moe_layer_list): ModuleList(
+    51.33 k, 45.29% Params, 202.94 KMACs, 7.22% MACs, 40.62 ms, 95.05% latency, 10.39 MFLOPS, 
+    (0): MoE(
+      21.93 k, 19.35% Params, 86.69 KMACs, 3.09% MACs, 36.25 ms, 84.83% latency, 4.93 MFLOPS, 
+      (deepspeed_moe): MOELayer(
+        14.62 k, 12.90% Params, 29.57 KMACs, 1.05% MACs, 35.7 ms, 83.54% latency, 1.81 MFLOPS, 
+        (gate): TopKGate(
+          336, 0.30% Params, 1.34 KMACs, 0.05% MACs, 33.62 ms, 78.67% latency, 80.94 KFLOPS, 
+          (wg): Linear(336, 0.30% Params, 1.34 KMACs, 0.05% MACs, 104.67 us, 0.24% latency, 25.68 MFLOPS, in_features=84, out_features=4, bias=False)
+        )
+        (experts): Experts(
+          14.28 k, 12.60% Params, 28.22 KMACs, 1.00% MACs, 495.43 us, 1.16% latency, 113.94 MFLOPS, 
+          (deepspeed_experts): ModuleList(
+            14.28 k, 12.60% Params, 28.22 KMACs, 1.00% MACs, 303.27 us, 0.71% latency, 186.13 MFLOPS, 
+            (0): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 171.42 us, 0.40% latency, 164.65 MFLOPS, in_features=84, out_features=84, bias=True)
+            (1): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 131.85 us, 0.31% latency, 214.07 MFLOPS, in_features=84, out_features=84, bias=True)
+          )
+        )
+      )
+      (mlp): Linear(7.14 k, 6.30% Params, 56.45 KMACs, 2.01% MACs, 220.78 us, 0.52% latency, 511.36 MFLOPS, in_features=84, out_features=84, bias=True)
+      (coefficient): Linear(170, 0.15% Params, 672 MACs, 0.02% MACs, 101.8 us, 0.24% latency, 13.2 MFLOPS, in_features=84, out_features=2, bias=True)
+    )
+    (1): MoE(
+      36.54 k, 32.24% Params, 116.26 KMACs, 4.14% MACs, 4.37 ms, 10.22% latency, 55.72 MFLOPS, 
+      (deepspeed_moe): MOELayer(
+        29.23 k, 25.79% Params, 59.14 KMACs, 2.10% MACs, 3.86 ms, 9.03% latency, 33.45 MFLOPS, 
+        (gate): TopKGate(
+          672, 0.59% Params, 2.69 KMACs, 0.10% MACs, 1.81 ms, 4.24% latency, 3.0 MFLOPS, 
+          (wg): Linear(672, 0.59% Params, 2.69 KMACs, 0.10% MACs, 90.6 us, 0.21% latency, 59.34 MFLOPS, in_features=84, out_features=8, bias=False)
+        )
+        (experts): Experts(
+          28.56 k, 25.20% Params, 56.45 KMACs, 2.01% MACs, 807.76 us, 1.89% latency, 139.76 MFLOPS, 
+          (deepspeed_experts): ModuleList(
+            28.56 k, 25.20% Params, 56.45 KMACs, 2.01% MACs, 530.48 us, 1.24% latency, 212.82 MFLOPS, 
+            (0): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 137.57 us, 0.32% latency, 205.16 MFLOPS, in_features=84, out_features=84, bias=True)
+            (1): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 128.27 us, 0.30% latency, 220.04 MFLOPS, in_features=84, out_features=84, bias=True)
+            (2): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 134.23 us, 0.31% latency, 210.27 MFLOPS, in_features=84, out_features=84, bias=True)
+            (3): Linear(7.14 k, 6.30% Params, 14.11 KMACs, 0.50% MACs, 130.41 us, 0.31% latency, 216.42 MFLOPS, in_features=84, out_features=84, bias=True)
+          )
+        )
+      )
+      (mlp): Linear(7.14 k, 6.30% Params, 56.45 KMACs, 2.01% MACs, 220.78 us, 0.52% latency, 511.36 MFLOPS, in_features=84, out_features=84, bias=True)
+      (coefficient): Linear(170, 0.15% Params, 672 MACs, 0.02% MACs, 101.57 us, 0.24% latency, 13.23 MFLOPS, in_features=84, out_features=2, bias=True)
+    )
+  )
+  (fc4): Linear(850, 0.75% Params, 3.36 KMACs, 0.12% MACs, 102.04 us, 0.24% latency, 65.85 MFLOPS, in_features=84, out_features=10, bias=True)
+)
+------------------------------------------------------------------------------

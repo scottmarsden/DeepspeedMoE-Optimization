@@ -9,7 +9,7 @@ EP_SIZE=2
 # Number of total experts
 EXPERTS=8
 
-/home/scttmars/.local/bin/deepspeed --num_nodes=${NUM_NODES} --num_gpus=${NUM_GPUS} cifar10_deepspeed.py \
+/home/scttmars/DeepspeedMoE-Optimization/DeepSpeed/bin/deepspeed --num_nodes=${NUM_NODES} --num_gpus=${NUM_GPUS} cifar10_deepspeed.py \
 	--log-interval 100 \
 	--deepspeed \
 	--deepspeed_config ds_config.json \
