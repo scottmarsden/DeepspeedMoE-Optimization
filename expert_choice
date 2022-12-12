@@ -1,0 +1,39 @@
+def expertChoice(logits: Tensor,
+               capacity_factor: float,
+               min_capacity: int,
+               used_token: Tensor = None,
+               noisy_gate_policy: Optional[str] = None,
+               drop_tokens: bool = True,
+               use_rts: bool = True,
+               use_tutel: bool = False) -> Tuple[Tensor,
+                                                 Tensor,
+                                                 Tensor,
+                                                 Tensor]:
+    gates = F.softmax(logits, dim=1)
+    capacity = _capacity(gates,
+                         torch.tensor(capacity_factor),
+                         torch.tensor(min_capacity))
+    #S is the token expert affinity scores
+    #W is the expert embeddings
+    #TopK() selects the k largest entries for each row of S
+    #outputs: I: idenx matrix where I[i,j] specifies the jth selected token of the ith expert
+    #G: the gating matrix denotes the weight of expert for the selected token 
+    #P: onehot version of I that is used to gather tokens for each expert
+    S = F.softmax(X * W)
+    G, I = topK(S, k)
+    P = onehot(I)
+
+     # Create a mask for 1st's expert per token
+    indices1_s = torch.argmax(gates, dim=1)
+    num_experts = int(gates.shape[1])
+    mask1 = F.one_hot(indices1_s, num_classes=num_experts)
+
+    #Calculate Xin = P * X
+    #X is each expert
+
+    #Find Xe[i] = GeLU(Xin[i] * W1[i]) * W2[i]
+    #Xe[i] denotes ith expert
+    #This is done similar to the above in the Feed Forward layer
+    
+    #Find Xout[l,d] = Sum(P[i,j,l]G[i,j]Xe[i,j,d]
+    #Both Xout and Xe can be commputed using einsum
