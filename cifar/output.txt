@@ -17,42 +17,42 @@ params of model = params per GPU * mp_size:                   91.24 k
 fwd MACs per GPU:                                             2.67 MMACs
 fwd flops per GPU:                                            5.42 M  
 fwd flops of model = fwd flops per GPU * mp_size:             5.42 M  
-fwd latency:                                                  11.32 ms
-fwd FLOPS per GPU = fwd flops per GPU / fwd latency:          478.94 MFLOPS
-bwd latency:                                                  5.43 ms 
-bwd FLOPS per GPU = 2 * fwd flops per GPU / bwd latency:      2.0 GFLOPS
-fwd+bwd FLOPS per GPU = 3 * fwd flops per GPU / (fwd+bwd latency):   971.06 MFLOPS
-step latency:                                                 5.04 ms 
-iter latency:                                                 21.78 ms
-FLOPS per GPU = 3 * fwd flops per GPU / iter latency:         746.45 MFLOPS
-samples/second:                                               734.60  
+fwd latency:                                                  10.4 ms 
+fwd FLOPS per GPU = fwd flops per GPU / fwd latency:          520.95 MFLOPS
+bwd latency:                                                  5.45 ms 
+bwd FLOPS per GPU = 2 * fwd flops per GPU / bwd latency:      1.99 GFLOPS
+fwd+bwd FLOPS per GPU = 3 * fwd flops per GPU / (fwd+bwd latency):   1.03 GFLOPS
+step latency:                                                 5.56 ms 
+iter latency:                                                 21.41 ms
+FLOPS per GPU = 3 * fwd flops per GPU / iter latency:         759.33 MFLOPS
+samples/second:                                               747.29  
 
 ----------------------------- Aggregated Profile per GPU -----------------------------
 Top 1 modules in terms of params, MACs or fwd latency at different model depths:
 depth 0:
     params      - {'Net': '91.24 k'}
     MACs        - {'Net': '2.67 MMACs'}
-    fwd latency - {'Net': '11.11 ms'}
+    fwd latency - {'Net': '10.26 ms'}
 depth 1:
     params      - {'Linear': '59.13 k'}
     MACs        - {'Conv2d': '2.37 MMACs'}
-    fwd latency - {'ModuleList': '8.84 ms'}
+    fwd latency - {'ModuleList': '8.28 ms'}
 depth 2:
     params      - {'MoE': '29.23 k'}
     MACs        - {'MoE': '59.14 KMACs'}
-    fwd latency - {'MoE': '8.84 ms'}
+    fwd latency - {'MoE': '8.28 ms'}
 depth 3:
     params      - {'MOELayer': '29.23 k'}
     MACs        - {'MOELayer': '59.14 KMACs'}
-    fwd latency - {'MOELayer': '8.76 ms'}
+    fwd latency - {'MOELayer': '8.22 ms'}
 depth 4:
     params      - {'Experts': '28.56 k'}
     MACs        - {'Experts': '56.45 KMACs'}
-    fwd latency - {'TopKGate': '6.3 ms'}
+    fwd latency - {'TopKGate': '5.45 ms'}
 depth 5:
     params      - {'ModuleList': '28.56 k'}
     MACs        - {'ModuleList': '56.45 KMACs'}
-    fwd latency - {'ModuleList': '611.54 us'}
+    fwd latency - {'ModuleList': '532.63 us'}
 
 ------------------------------ Detailed Profile per GPU ------------------------------
 Each module profile is listed after its name in the following order: 
@@ -63,35 +63,35 @@ Note: 1. A module can have torch.nn.module or torch.nn.functional to compute log
 3. The fwd latency listed in the top module's profile is directly captured at the module forward function in PyTorch, thus it's less than the fwd latency shown above which is captured in DeepSpeed.
 
 Net(
-  91.24 k, 100.00% Params, 2.67 MMACs, 100.00% MACs, 11.11 ms, 100.00% latency, 487.63 MFLOPS, 
-  (conv1): Conv2d(456, 0.50% Params, 1.41 MMACs, 52.93% MACs, 390.53 us, 3.51% latency, 7.28 GFLOPS, 3, 6, kernel_size=(5, 5), stride=(1, 1))
-  (pool): MaxPool2d(0, 0.00% Params, 0 MACs, 0.00% MACs, 338.08 us, 3.04% latency, 74.59 MFLOPS, kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-  (conv2): Conv2d(2.42 k, 2.65% Params, 960.0 KMACs, 36.01% MACs, 309.94 us, 2.79% latency, 6.22 GFLOPS, 6, 16, kernel_size=(5, 5), stride=(1, 1))
-  (fc1): Linear(48.12 k, 52.74% Params, 192.0 KMACs, 7.20% MACs, 218.87 us, 1.97% latency, 1.75 GFLOPS, in_features=400, out_features=120, bias=True)
-  (fc2): Linear(10.16 k, 11.14% Params, 40.32 KMACs, 1.51% MACs, 167.85 us, 1.51% latency, 480.44 MFLOPS, in_features=120, out_features=84, bias=True)
+  91.24 k, 100.00% Params, 2.67 MMACs, 100.00% MACs, 10.26 ms, 100.00% latency, 528.33 MFLOPS, 
+  (conv1): Conv2d(456, 0.50% Params, 1.41 MMACs, 52.93% MACs, 277.76 us, 2.71% latency, 10.23 GFLOPS, 3, 6, kernel_size=(5, 5), stride=(1, 1))
+  (pool): MaxPool2d(0, 0.00% Params, 0 MACs, 0.00% MACs, 202.89 us, 1.98% latency, 124.28 MFLOPS, kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (conv2): Conv2d(2.42 k, 2.65% Params, 960.0 KMACs, 36.01% MACs, 217.44 us, 2.12% latency, 8.86 GFLOPS, 6, 16, kernel_size=(5, 5), stride=(1, 1))
+  (fc1): Linear(48.12 k, 52.74% Params, 192.0 KMACs, 7.20% MACs, 166.18 us, 1.62% latency, 2.31 GFLOPS, in_features=400, out_features=120, bias=True)
+  (fc2): Linear(10.16 k, 11.14% Params, 40.32 KMACs, 1.51% MACs, 113.25 us, 1.10% latency, 712.06 MFLOPS, in_features=120, out_features=84, bias=True)
   (moe_layer_list): ModuleList(
-    29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.84 ms, 79.52% latency, 14.61 MFLOPS, 
+    29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.28 ms, 80.77% latency, 15.58 MFLOPS, 
     (0): MoE(
-      29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.84 ms, 79.52% latency, 14.61 MFLOPS, 
+      29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.28 ms, 80.77% latency, 15.58 MFLOPS, 
       (deepspeed_moe): MOELayer(
-        29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.76 ms, 78.84% latency, 14.73 MFLOPS, 
+        29.23 k, 32.04% Params, 59.14 KMACs, 2.22% MACs, 8.22 ms, 80.10% latency, 15.71 MFLOPS, 
         (gate): TopKGate(
-          672, 0.74% Params, 2.69 KMACs, 0.10% MACs, 6.3 ms, 56.69% latency, 863.65 KFLOPS, 
-          (wg): Linear(672, 0.74% Params, 2.69 KMACs, 0.10% MACs, 116.59 us, 1.05% latency, 46.11 MFLOPS, in_features=84, out_features=8, bias=False)
+          672, 0.74% Params, 2.69 KMACs, 0.10% MACs, 5.45 ms, 53.15% latency, 998.08 KFLOPS, 
+          (wg): Linear(672, 0.74% Params, 2.69 KMACs, 0.10% MACs, 121.83 us, 1.19% latency, 44.13 MFLOPS, in_features=84, out_features=8, bias=False)
         )
         (experts): Experts(
-          28.56 k, 31.30% Params, 56.45 KMACs, 2.12% MACs, 881.91 us, 7.94% latency, 128.01 MFLOPS, 
+          28.56 k, 31.30% Params, 56.45 KMACs, 2.12% MACs, 769.62 us, 7.50% latency, 146.69 MFLOPS, 
           (deepspeed_experts): ModuleList(
-            28.56 k, 31.30% Params, 56.45 KMACs, 2.12% MACs, 611.54 us, 5.50% latency, 184.61 MFLOPS, 
-            (0): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 201.46 us, 1.81% latency, 140.09 MFLOPS, in_features=84, out_features=84, bias=True)
-            (1): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 139.24 us, 1.25% latency, 202.71 MFLOPS, in_features=84, out_features=84, bias=True)
-            (2): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 135.9 us, 1.22% latency, 207.68 MFLOPS, in_features=84, out_features=84, bias=True)
-            (3): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 134.94 us, 1.21% latency, 209.15 MFLOPS, in_features=84, out_features=84, bias=True)
+            28.56 k, 31.30% Params, 56.45 KMACs, 2.12% MACs, 532.63 us, 5.19% latency, 211.96 MFLOPS, 
+            (0): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 146.87 us, 1.43% latency, 192.18 MFLOPS, in_features=84, out_features=84, bias=True)
+            (1): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 130.41 us, 1.27% latency, 216.42 MFLOPS, in_features=84, out_features=84, bias=True)
+            (2): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 128.03 us, 1.25% latency, 220.45 MFLOPS, in_features=84, out_features=84, bias=True)
+            (3): Linear(7.14 k, 7.83% Params, 14.11 KMACs, 0.53% MACs, 127.32 us, 1.24% latency, 221.69 MFLOPS, in_features=84, out_features=84, bias=True)
           )
         )
       )
     )
   )
-  (fc4): Linear(850, 0.93% Params, 3.36 KMACs, 0.13% MACs, 123.02 us, 1.11% latency, 54.62 MFLOPS, in_features=84, out_features=10, bias=True)
+  (fc4): Linear(850, 0.93% Params, 3.36 KMACs, 0.13% MACs, 104.67 us, 1.02% latency, 64.2 MFLOPS, in_features=84, out_features=10, bias=True)
 )
 ------------------------------------------------------------------------------
